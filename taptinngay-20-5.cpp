@@ -1,186 +1,220 @@
+	//Danh sach lien ket da thuc
 	#include <stdio.h>
-	#include <stdlib.h>
+	#include <math.h>
 	
-	//================= CAU TRUC =================
-	typedef struct DaThuc {
-	    int heso;
-	    int somu;
-	} DaThuc;
+	typedef struct dathuc
+	{
+	    int c, n;
+	} dathuc;
 	
-	typedef struct Node {
-	    DaThuc data;
-	    Node* next;
+	typedef struct Node
+	{
+	    dathuc Info;
+	    Node* pNext;
 	} Node;
 	
-	typedef struct List {
-	    Node* head;
-	    Node* tail;
+	typedef struct List
+	{
+	    Node* pHead;
+	    Node* pTail;
 	} List;
 	
-	//================= KHAI BAO HAM =================
-	void KhoiTao(List &l);
-	Node* TaoNode(DaThuc x);
-	void ThemCuoi(List &l, DaThuc x);
-	void Nhap(List &l);
-	void Xuat(List l);
-	void RutGon(List &l);
-	long Mu(int x, int n);
-	long TinhGiaTri(List l, int x);
-	void XoaNode(List &l, Node* prev, Node* cur);
+	//Khai bao ham
+	void Init(List &l);
+	Node* GetNode(dathuc x);
+	void AddTail(List &l, Node *new_ele);
+	void InputTail(List &l);
+	void Output(List l);
+	void Output2(List l);
+	void RemoveAfter(List &l, Node *q);
+	long Valua(List l, int x);
+	void Reduce(List &l);
 	
-	//================= MAIN =================
-	int main() {
-	    List l;
+	int main()
+	{
+	    List ds;
 	    int x;
 	
-	    KhoiTao(l);
+	    //Khoi tao danh sach
+	    Init(ds);
 	
-	    Nhap(l);
+	    //Nhap da thuc
+	    InputTail(ds);
 	
-	    printf("\nDa thuc ban dau:\n");
-	    Xuat(l);
+	    //Xuat da thuc
+	    Output2(ds);
 	
+	    //Nhap x
 	    printf("\nNhap x: ");
 	    scanf("%d", &x);
 	
-	    printf("P(%d) = %ld\n", x, TinhGiaTri(l, x));
+	    //Tinh gia tri da thuc
+	    printf("\nP(%d) = %ld", x, Valua(ds, x));
 	
-	    RutGon(l);
+	    //Rut gon da thuc
+	    Reduce(ds);
 	
-	    printf("\nSau khi rut gon:\n");
-	    Xuat(l);
+	    printf("\nDa thuc sau khi rut gon:");
+	    Output2(ds);
 	
 	    return 0;
 	}
 	
-	//================= KHOI TAO =================
-	void KhoiTao(List &l) {
-	    l.head = l.tail = NULL;
+	//Tao danh sach rong
+	void Init(List &l)
+	{
+	    l.pHead = l.pTail = NULL;
 	}
 	
-	//================= TAO NODE =================
-	Node* TaoNode(DaThuc x) {
-	    Node* p = (Node*)malloc(sizeof(Node));
-	    if (!p) return NULL;
+	//Tao node
+	Node* GetNode(dathuc x)
+	{
+	    Node *p;
 	
-	    p->data = x;
-	    p->next = NULL;
+	    p = new Node;
+	
+	    if(p == NULL)
+	    {
+	        printf("Khong du bo nho!");
+	        return NULL;
+	    }
+	
+	    p->Info = x;
+	    p->pNext = NULL;
+	
 	    return p;
 	}
 	
-	//================= THEM CUOI =================
-	void ThemCuoi(List &l, DaThuc x) {
-	    Node* p = TaoNode(x);
-	    if (!p) return;
-	
-	    if (l.head == NULL) {
-	        l.head = l.tail = p;
-	    } else {
-	        l.tail->next = p;
-	        l.tail = p;
+	//Them vao cuoi danh sach
+	void AddTail(List &l, Node *new_ele)
+	{
+	    if(l.pHead == NULL)
+	    {
+	        l.pHead = new_ele;
+	        l.pTail = l.pHead;
+	    }
+	    else
+	    {
+	        l.pTail->pNext = new_ele;
+	        l.pTail = new_ele;
 	    }
 	}
 	
-	//================= NHAP =================
-	void Nhap(List &l) {
+	//Nhap da thuc
+	void InputTail(List &l)
+	{
 	    int n;
+	    dathuc x;
+	
+	    printf("Nhap so luong don thuc: ");
 	    scanf("%d", &n);
 	
-	    for (int i = 0; i < n; i++) {
-	        DaThuc x;
-	        scanf("%d%d", &x.heso, &x.somu);
-	        ThemCuoi(l, x);
+	    for(int i = 1; i <= n; i++)
+	    {
+	        printf("\nNhap he so: ");
+	        scanf("%d", &x.c);
+	
+	        printf("Nhap so mu: ");
+	        scanf("%d", &x.n);
+	
+	        Node* p = GetNode(x);
+	
+	        AddTail(l, p);
 	    }
 	}
 	
-	//================= XUAT DA THUC =================
-	void Xuat(List l) {
-	    Node* p = l.head;
-	    int first = 1;
+	//In danh sach
+	void Output(List l)
+	{
+	    Node* p = l.pHead;
 	
-	    printf("P(x) = ");
+	    while(p != NULL)
+	    {
+	        printf("\n%dx^%d", p->Info.c, p->Info.n);
 	
-	    while (p != NULL) {
-	        if (p->data.heso != 0) {
+	        p = p->pNext;
+	    }
+	}
 	
-	            if (!first && p->data.heso > 0)
-	                printf(" + ");
+	//In da thuc theo dang P(x)
+	void Output2(List l)
+	{
+	    Node* p = l.pHead;
 	
-	            if (p->data.somu == 0)
-	                printf("%d", p->data.heso);
-	            else if (p->data.somu == 1)
-	                printf("%dx", p->data.heso);
-	            else
-	                printf("%dx^%d", p->data.heso, p->data.somu);
+	    printf("\nP(x) = ");
 	
-	            first = 0;
+	    while(p != NULL)
+	    {
+	        printf("%dx^%d", p->Info.c, p->Info.n);
+	
+	        if(p->pNext != NULL)
+	        {
+	            printf(" + ");
 	        }
 	
-	        p = p->next;
+	        p = p->pNext;
 	    }
-	
-	    if (first)
-	        printf("0");
-	
-	    printf("\n");
 	}
 	
-	//================= XOA NODE =================
-	void XoaNode(List &l, Node* prev, Node* cur) {
-	    if (prev == NULL) {
-	        l.head = cur->next;
-	    } else {
-	        prev->next = cur->next;
+	//Xoa node sau q
+	void RemoveAfter(List &l, Node *q)
+	{
+	    if((q != NULL) && (q->pNext != NULL))
+	    {
+	        Node* p = q->pNext;
+	
+	        q->pNext = p->pNext;
+	
+	        if(p == l.pTail)
+	        {
+	            l.pTail = q;
+	        }
+	
+	        delete p;
 	    }
-	
-	    if (cur == l.tail)
-	        l.tail = prev;
-	
-	    free(cur);
 	}
 	
-	//================= RUT GON DA THUC ================= // về sửa thêm 
-	void RutGon(List &l) {
-	    Node* p = l.head;
+	//Tinh gia tri da thuc
+	long Valua(List l, int x)
+	{
+	    Node* p = l.pHead;
 	
-	    while (p != NULL) {
-	        Node* prev = p;
-	        Node* q = p->next;
+	    long px = 0;
 	
-	        while (q != NULL) {
-	            if (q->data.somu == p->data.somu) {
-	                p->data.heso += q->data.heso;
+	    while(p != NULL)
+	    {
+	        px = px + p->Info.c * pow(x, p->Info.n);
 	
-	                Node* temp = q;
-	                q = q->next;
-	                XoaNode(l, prev, temp);
-	            } else {
-	                prev = q;
-	                q = q->next;
+	        p = p->pNext;
+	    }
+	
+	    return px;
+	}
+	
+	//Rut gon da thuc
+	void Reduce(List &l)
+	{
+	    Node *q1, *p = l.pHead;
+	
+	    while(p != NULL)
+	    {
+	        q1 = p;
+	
+	        while(q1->pNext != NULL)
+	        {
+	            if(q1->pNext->Info.n == p->Info.n)
+	            {
+	                p->Info.c =
+	                p->Info.c + q1->pNext->Info.c;
+	
+	                RemoveAfter(l, q1);
+	            }
+	            else
+	            {
+	                q1 = q1->pNext;
 	            }
 	        }
 	
-	        p = p->next;
+	        p = p->pNext;
 	    }
-	}
-	
-	//================= LUY THUA =================
-	long Mu(int x, int n) {
-	    long kq = 1;
-	    for (int i = 0; i < n; i++)
-	        kq *= x;
-	    return kq;
-	}
-	
-	//================= TINH GIA TRI =================
-	long TinhGiaTri(List l, int x) {
-	    long kq = 0;
-	    Node* p = l.head;
-	
-	    while (p != NULL) {
-	        kq += p->data.heso * Mu(x, p->data.somu);
-	        p = p->next;
-	    }
-	
-	    return kq;
 	}
